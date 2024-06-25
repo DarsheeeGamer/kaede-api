@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hybridy Control Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body { 
+        font-family: sans-serif; 
+    }
+
+    #console { 
+        width: 80%; 
+        height: 200px; 
+        border: 1px solid #ccc; 
+        padding: 10px;
+        overflow-y: scroll;
+        margin: 10px auto;
+    }
+    input[type="text"] {
+        width: 70%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+    }
+    button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        background-color: #4CAF50; 
+        color: white;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+    <h1>Hybridy Control Panel</h1>
+
+    {% if not authenticated %}
+        <form method="POST" action="/control/hybridy">
+            <label for="token">API Token:</label><br>
+            <input type="text" id="token" name="token" required><br>
+            <button type="submit">Login</button>
+        </form>
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    {% else %}
+        <input type="hidden" id="api_token" value="{{ api_token }}">
+
+        <div id="status">Connecting...</div>
+        <div id="ping">Ping: N/A</div>
+
+        <button onclick="sendCommand('$status')">Get Status</button>
+        <button onclick="sendCommand('$on')">Turn On</button>
+        <button onclick="sendCommand('$off')">Turn Off</button>
+        <button onclick="getIDsAndSendCommand('$ban')">Ban User</button>
+        <button onclick="getIDsAndSendCommand('$giverole')">Give Role</button>
+        <button onclick="getIDsAndSendCommand('$removerole')">Remove Role</button>
+        <button onclick="getIDsAndSendCommand('$mute')">Mute User</button>
+        <button onclick="getIDsAndSendCommand('$unmute')">Unmute User</button>
+        <button onclick="getIDsAndSendCommand('$unban')">Unban User</button>
+        <button onclick="getIDAndSendCommand('$lock', 'Channel ID:')">Lock Channel</button>
+        <button onclick="getIDAndSendCommand('$unlock', 'Channel ID:')">Unlock Channel</button>
+        <button onclick="getEchoInput()">Echo to Channel</button>
+        <button onclick="sendCommand('$help')">Help</button>
+
+        <h2>Terminal</h2>
+        <div id="console"></div>
+        <input type="text" id="command-input" placeholder="Enter command...">
+        <button onclick="sendCommandFromInput()">Send</button>
+
+        <script>
+            function getTokenFromPage() {
+                return document.getElementById('api_token').value;
+            }
+
+            function sendCommand(command) {
+                const token = getTokenFromPage();
+                if (!token) {
+                    appendToConsole("Error: API token not found.", "Error");
+                    return;
+                }
+
+                fetch('/send_command', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `token=${token}&command=${command}`
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        appendToConsole("Error: " + data.error, "API");
+                    } else {
+                        appendToConsole(data.response, "API");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending command:', error);
+                    appendToConsole("Error sending command!", "Error");
+                });
+            }
+
+            function sendCommandFromInput() {
+                const commandInput = document.getElementById("command-input");
+                const command = commandInput.value.trim();
+                if (command !== "") {
+                    sendCommand(command);
+                    commandInput.value = "";
+                }
+            }
+
+            function appendToConsole(message, sender = "You") {
+                const consoleOutput = document.getElementById("console");
+                const p = document.createElement("p");
+                p.textContent = `${sender}: ${message}`;
+                consoleOutput.appendChild(p);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
+
+            // Function to get multiple IDs (guild, member, optional role)
+            function getIDsAndSendCommand(command) {
+                const guildId = prompt("Enter Guild ID:");
+                if (guildId === null || guildId.trim() === "") return; 
+
+                const memberId = prompt("Enter Member ID:");
+                if (memberId === null || memberId.trim() === "") return;
+
+                let fullCommand = `${command} ${guildId} ${memberId}`;
+
+                if (command === '$giverole' || command === '$removerole') {
+                    const roleId = prompt("Enter Role ID:");
+                    if (roleId === null || roleId.trim() === "") return;
+                    fullCommand += ` ${roleId}`;
+                }
+
+                sendCommand(fullCommand);
+            }
+
+            // Function to get one ID (channel ID)
+            function getIDAndSendCommand(command, promptText) {
+                const id = prompt(promptText);
+                if (id === null || id.trim() === "") return;
+                sendCommand(`${command} ${id}`);
+            }
+
+            // Function to get echo input (message and channel ID)
+            function getEchoInput() {
+                const message = prompt("Enter the message to echo:");
+                if (message === null || message.trim() === "") return;
+
+                const channelId = prompt("Enter the Channel ID:");
+                if (channelId === null || channelId.trim() === "") return;
+
+                sendCommand(`$echo ${message} ${channelId}`);
+            }
+        </script>
+    {% endif %}
+</body>
+</html>

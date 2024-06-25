@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaede API Status</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: bold;
+            color: #007bff; /* Blue color */
+        }
+
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .section h3 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-item {
+            margin-bottom: 10px;
+        }
+
+        .status-item .status-label {
+            font-weight: bold;
+        }
+
+        .status-item .status-value {
+            margin-left: 10px;
+        }
+
+        .status-item .status-value.ok {
+            color: green;
+        }
+
+        .status-item .status-value.warning {
+            color: orange;
+        }
+
+        .status-item .status-value.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kaede API Status</h1>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>System Metrics</h2>
+                <div class="status-item">
+                    <span class="status-label">CPU Usage:</span>
+                    <span class="status-value" id="cpu-usage"></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Memory Usage:</span>
+                    <span class="status-value" id="memory-usage"></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Network Traffic:</span>
+                    <span class="status-value" id="network-traffic"></span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>API Health Checks</h2>
+                <div id="health-checks">
+                    <!-- Health checks will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Redis Information</h2>
+                <div class="status-item">
+                    <span class="status-label">Redis Version:</span>
+                    <span class="status-value" id="redis-version"></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Redis Used Memory:</span>
+                    <span class="status-value" id="redis-memory"></span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Redis Connected Clients:</span>
+                    <span class="status-value" id="redis-clients"></span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Connected Bots</h2>
+                <div id="connected-bots">
+                    <!-- Connected bots will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Update System Metrics ---
+        function updateSystemMetrics() {
+            fetch('/status_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('cpu-usage').textContent = data.cpu_percent + '%';
+                    document.getElementById('memory-usage').textContent = data.memory.percent + '%';
+                    document.getElementById('network-traffic').textContent = `${data.network.bytes_sent} sent, ${data.network.bytes_recv} received`;
+                });
+        }
+
+        // --- Update API Health Checks ---
+        function updateHealthChecks() {
+            fetch('/status_data')
+                .then(response => response.json())
+                .then(data => {
+                    const healthChecksContainer = document.getElementById('health-checks');
+                    healthChecksContainer.innerHTML = '';
+
+                    data.api_health_checks.forEach(check => {
+                        const statusItem = document.createElement('div');
+                        statusItem.classList.add('status-item');
+
+                        const statusLabel = document.createElement('span');
+                        statusLabel.classList.add('status-label');
+                        statusLabel.textContent = check.name + ':';
+
+                        const statusValue = document.createElement('span');
+                        statusValue.classList.add('status-value');
+
+                        if (check.status === 'OK') {
+                            statusValue.classList.add('ok');
+                            statusValue.textContent = check.status;
+                        } else if (check.status.startsWith('Warning')) {
+                            statusValue.classList.add('warning');
+                            statusValue.textContent = check.status;
+                        } else {
+                            statusValue.classList.add('error');
+                            statusValue.textContent = check.status;
+                        }
+
+                        statusItem.appendChild(statusLabel);
+                        statusItem.appendChild(statusValue);
+                        healthChecksContainer.appendChild(statusItem);
+                    });
+                });
+        }
+
+        // --- Update Redis Information ---
+        function updateRedisInfo() {
+            fetch('/status_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('redis-version').textContent = data.redis_version;
+                    document.getElementById('redis-memory').textContent = data.redis_used_memory;
+                    document.getElementById('redis-clients').textContent = data.redis_connected_clients;
+                });
+        }
+
+        // --- Update Connected Bots ---
+        function updateConnectedBots() {
+            fetch('/status_data')
+                .then(response => response.json())
+                .then(data => {
+                    const connectedBotsContainer = document.getElementById('connected-bots');
+                    connectedBotsContainer.innerHTML = '';
+
+                    if (data.connected_bots.length === 0) {
+                        const noBots = document.createElement('p');
+                        noBots.textContent = 'No bots currently connected';
+                        connectedBotsContainer.appendChild(noBots);
+                    } else {
+                        data.connected_bots.forEach(bot => {
+                            const botItem = document.createElement('p');
+                            botItem.textContent = bot;
+                            connectedBotsContainer.appendChild(botItem);
+                        });
+                    }
+                });
+        }
+
+        // --- Initial Update and Regular Updates ---
+        updateSystemMetrics();
+        updateHealthChecks();
+        updateRedisInfo();
+        updateConnectedBots();
+
+        setInterval(updateSystemMetrics, 1); // Update every 1 second
+        setInterval(updateHealthChecks, 1); // Update every 1 second
+        setInterval(updateRedisInfo, 1); // Update every 1 second
+        setInterval(updateConnectedBots, 1); // Update every 1 second
+    </script>
+</body>
+</html>

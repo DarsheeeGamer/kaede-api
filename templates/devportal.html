@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaede Dev Portal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            background-color: #2c2f33;
+            color: #fff;
+            width: 250px;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100%;
+            transition: width 0.3s;
+            overflow-y: auto;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 10px;
+            left: 250px;
+            background-color: #2c2f33;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 20px;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        .toggle-btn span {
+            display: inline-block;
+            transform: rotate(180deg);
+            transition: transform 0.3s;
+        }
+
+        .sidebar.collapsed {
+            width: 50px;
+        }
+
+        .sidebar.collapsed .toggle-btn {
+            left: 50px;
+        }
+
+        .sidebar.collapsed .toggle-btn span {
+            transform: rotate(0);
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: #b9bbbe;
+            text-decoration: none;
+            font-size: 16px;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .sidebar ul li a:hover {
+            color: #fff;
+            background-color: #42454a;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+            transition: margin-left 0.3s;
+        }
+
+        .header {
+            background-color: #7289da;
+            color: #fff;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        p {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: #7289da;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background-color: #5a6ea8;
+        }
+
+        /* Forms */
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+            color: #333;
+        }
+
+        /* Project Status */
+        .project {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .project h3 {
+            margin: 0 0 10px;
+            color: #333;
+        }
+
+        .project p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .header .create-project-btn {
+            background-color: #43b581;
+            padding: 10px 20px;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            border: none;
+        }
+
+        .header .create-project-btn:hover {
+            background-color: #3a9d6b;
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        /* Login/Registration Form */
+        #loginForm, #registrationForm {
+            display: none;
+        }
+
+        #loginForm.active, #registrationForm.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="toggle-btn" onclick="if (!window.__cfRLUnblockHandlers) return false; toggleSidebar()" data-cf-modified-81f84ea5c21756c4e521f8f0-="">
+            <span>◀</span>
+        </div>
+        <h2>Kaede Dev Portal</h2>
+        <ul>
+            <li><a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; showSection('bot-panel')" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Bot Panel</a></li>
+            <li><a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; showSection('console-token')" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Console Token</a></li>
+            <li><a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; showSection('route-builder')" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Route Builder</a></li>
+            <li><a href="https://apikaede.nexcord.pro/docs" target="_blank">API Documents</a></li>
+            <li><a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; showSection('projects')" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Projects</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <h1>Welcome to Kaede Dev Portal</h1>
+            <button class="create-project-btn" onclick="if (!window.__cfRLUnblockHandlers) return false; createProject()" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Create New Project</button>
+        </div>
+        <div class="content">
+            <!-- Login Section -->
+            <div id="loginSection" class="section active">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Username:</label>
+                        <input type="text" class="form-control" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" class="form-control" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <p class="mt-3">Don't have an account? <a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; showRegistrationForm()" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Register here</a></p>
+                </form>
+            </div>
+
+            <!-- Registration Section -->
+            <div id="registrationSection" class="section hidden">
+                <h2>Register</h2>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="regUsername">Username:</label>
+                        <input type="text" class="form-control" id="regUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password:</label>
+                        <input type="password" class="form-control" id="regPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email:</label>
+                        <input type="email" class="form-control" id="regEmail" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                    <p class="mt-3">Already have an account? <a href="#" onclick="if (!window.__cfRLUnblockHandlers) return false; showLoginForm()" data-cf-modified-81f84ea5c21756c4e521f8f0-="">Login here</a></p>
+                </form>
+            </div>
+
+            <!-- Bot Panel Section -->
+            <div id="bot-panel" class="section hidden">
+                <h2>Bot Panel</h2>
+                <p>Manage your bots here.</p>
+                <form id="botTokenForm">
+                    <div class="form-group">
+                        <label for="botToken">Enter Your Bot Token:</label>
+                        <input type="text" class="form-control" id="botToken" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+                <div id="botTokenMessage" class="alert hidden mt-3" role="alert"></div>
+            </div>
+
+            <!-- Console Token Section -->
+            <div id="console-token" class="section hidden">
+                <h2>Console Token</h2>
+                <p>Your console token will be displayed here after you add a bot.</p>
+                <div id="consoleTokenDisplay" class="mt-3"></div>
+            </div>
+
+            <!-- Route Builder Section -->
+            <div id="route-builder" class="section hidden">
+                <h2>Route Builder</h2>
+                <p>Build your routes here.</p>
+            </div>
+
+            <!-- Projects Section -->
+            <div id="projects" class="section hidden">
+                <h2>Projects</h2>
+                <div id="project-status">
+                    <!-- Project status will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="81f84ea5c21756c4e521f8f0-text/javascript">
+        function toggleSidebar() {
+            var sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("collapsed");
+            var toggleBtn = document.querySelector(".toggle-btn span");
+            toggleBtn.innerHTML = sidebar.classList.contains("collapsed") ? "▶" : "◀";
+        }
+
+        function showSection(sectionId) {
+            var sections = document.querySelectorAll('.section');
+            sections.forEach(function(section) {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            document.getElementById('registrationForm').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('registrationSection').classList.remove('active');
+        }
+
+        function showRegistrationForm() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registrationForm').classList.remove('hidden');
+            document.getElementById('registrationSection').classList.add('active');
+            document.getElementById('loginSection').classList.remove('active');
+        }
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var username = document.getElementById('loginUsername').value;
+            var password = document.getElementById('loginPassword').value;
+
+            fetch('/devportal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${username}&password=${password}&login=true`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Store the user token in local storage
+                    localStorage.setItem('userToken', data.user_token);
+                    // Redirect to the dev portal or display a success message
+                    alert(data.message);
+                    window.location.reload(); // Reload the page to show logged-in content
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during login.');
+            });
+        });
+
+        // Handle registration form submission
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var username = document.getElementById('regUsername').value;
+            var password = document.getElementById('regPassword').value;
+            var email = document.getElementById('regEmail').value;
+
+            fetch('/devportal', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `username=${username}&password=${password}&email=${email}®ister=true`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    showLoginForm(); // Show the login form after successful registration
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during registration.');
+            });
+        });
+
+        // Handle bot token form submission
+        document.getElementById('botTokenForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var botToken = document.getElementById('botToken').value;
+            var userToken = localStorage.getItem('userToken');
+
+            if (!userToken) {
+                alert("You need to be logged in to add a bot.");
+                return;
+            }
+
+            fetch('/add_bot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `bot_token=${botToken}&user_token=${userToken}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                var messageDiv = document.getElementById('botTokenMessage');
+                messageDiv.classList.remove('hidden');
+                if (data.error) {
+                    messageDiv.classList.add('alert-danger');
+                    messageDiv.textContent = data.error;
+                } else {
+                    messageDiv.classList.add('alert-success');
+                    messageDiv.textContent = data.message;
+
+                    // Display the console token
+                    var consoleTokenDisplay = document.getElementById('consoleTokenDisplay');
+                    consoleTokenDisplay.innerHTML = `<p>Your console token is: <strong>${data.console_token}</strong></p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while adding the bot.');
+            });
+        });
+
+        function createProject() {
+            // Function to create a new project and update the project status
+            alert("Create Project function called");
+            // Example of adding a new project dynamically
+            var projectStatus = document.getElementById('project-status');
+            var newProject = document.createElement('div');
+            newProject.className = 'project';
+            newProject.innerHTML = `
+                <h3>New Project</h3>
+                <p>Status: <span style="color: green;">Connected</span></p>
+                <p>API Token: new-api-token</p>
+            `;
+            projectStatus.appendChild(newProject);
+        }
+
+        // Check if the user is logged in and load projects
+        window.onload = function() {
+            var userToken = localStorage.getItem('userToken');
+            if (userToken) {
+                // User is logged in, load projects
+                loadProjects(userToken);
+            }
+        };
+
+        function loadProjects(userToken) {
+            fetch('/get_projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `user_token=${userToken}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.projects) {
+                    displayProjects(data.projects);
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while loading projects.');
+            });
+        }
+
+        function displayProjects(projects) {
+            var projectStatus = document.getElementById('project-status');
+            projectStatus.innerHTML = ''; // Clear existing projects
+
+            projects.forEach(function(project) {
+                var newProject = document.createElement('div');
+                newProject.className = 'project';
+                newProject.innerHTML = `
+                    <h3>${project.name}</h3>
+                    <p>Status: <span style="color: ${project.connected ? 'green' : 'red'};">${project.connected ? 'Connected' : 'Disconnected'}</span></p>
+                    <p>API Token: ${project.api_token}</p>
+                `;
+                projectStatus.appendChild(newProject);
+            });
+        }
+    </script>
+<script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="81f84ea5c21756c4e521f8f0-|49" defer></script><script>(function(){if (!document.body) return;var js = "window['__CF$cv$params']={r:'88f961049e1bf0d3',t:'MTcxNzY4NzE0OC4zMTYwMDA='};_cpo=document.createElement('script');_cpo.nonce='',_cpo.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js',document.getElementsByTagName('head')[0].appendChild(_cpo);";var _0xh = document.createElement('iframe');_0xh.height = 1;_0xh.width = 1;_0xh.style.position = 'absolute';_0xh.style.top = 0;_0xh.style.left = 0;_0xh.style.border = 'none';_0xh.style.visibility = 'hidden';document.body.appendChild(_0xh);function handler() {var _0xi = _0xh.contentDocument || _0xh.contentWindow.document;if (_0xi) {var _0xj = _0xi.createElement('script');_0xj.innerHTML = js;_0xi.getElementsByTagName('head')[0].appendChild(_0xj);}}if (document.readyState !== 'loading') {handler();} else if (window.addEventListener) {document.addEventListener('DOMContentLoaded', handler);} else {var prev = document.onreadystatechange || function () {};document.onreadystatechange = function (e) {prev(e);if (document.readyState !== 'loading') {document.onreadystatechange = prev;handler();}};}})();</script></body>
+</html>

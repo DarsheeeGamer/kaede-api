@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaede API Troubleshooting</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: bold;
+            color: #007bff; /* Blue color */
+        }
+
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .section h3 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .troubleshooting-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .troubleshooting-item h4 {
+            margin-top: 0;
+        }
+
+        .troubleshooting-item .error-code {
+            font-weight: bold;
+        }
+
+        .troubleshooting-item .error-description {
+            margin-top: 5px;
+        }
+
+        .troubleshooting-item .solution {
+            margin-top: 10px;
+        }
+
+        .troubleshooting-item .solution pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Preserve line breaks */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kaede API Troubleshooting</h1>
+        </div>
+
+        <div class="content">
+            <h2>Common Errors and Solutions</h2>
+            <div class="section">
+                <h3>Registration Errors</h3>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">400: Bad Request</span></h4>
+                    <p class="error-description">This error occurs when the username or Discord bot token is missing in the request body of the <code>/register_bot</code> endpoint.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Ensure that both the username and Discord bot token are included in the request body as JSON data.
+                        <pre>
+                            <code>
+                                curl -X POST -H "Content-Type: application/json" \
+                                -d '{"username": "MyBot", "discord_bot_token": "YOUR_DISCORD_BOT_TOKEN"}' \
+                                https://your_domain/register_bot
+                            </code>
+                        </pre>
+                    </p>
+                </div>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">401: Unauthorized</span></h4>
+                    <p class="error-description">This error occurs when the provided Discord bot token is invalid.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Verify that you are using a valid Discord bot token. Double-check the token from your Discord bot settings and ensure it is correctly entered in the request.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Connection Errors</h3>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">401: Unauthorized</span></h4>
+                    <p class="error-description">This error occurs when the API token or console token is invalid during bot connection, disconnection, or command sending.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Verify that you are using valid API and console tokens. Double-check the tokens from your developer portal or the registration response. Ensure that the Console-Token header is included in your requests.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Command Errors</h3>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">400: Bad Request</span></h4>
+                    <p class="error-description">This error occurs when the command is missing in the request body of the <code>/send_command</code> endpoint.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Ensure that you include the command in the request body as JSON data.
+                        <pre>
+                            <code>
+                                curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                                -H "Content-Type: application/json" \
+                                -d '{"command": "play music"}' \
+                                https://your_domain/send_command/YOUR_API_TOKEN
+                            </code>
+                        </pre>
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>YouTube Search Errors</h3>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">401: Unauthorized</span></h4>
+                    <p class="error-description">This error occurs when the API token or console token is invalid during a YouTube search.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Verify that you are using valid API and console tokens. Double-check the tokens from your developer portal or the registration response. Ensure that the Console-Token header is included in your requests.
+                    </p>
+                </div>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">400: Bad Request</span></h4>
+                    <p class="error-description">This error occurs when the search query is missing in the request body of the <code>/search_youtube</code> endpoint.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Ensure that you include the search query in the request body as JSON data.
+                        <pre>
+                            <code>
+                                curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                                -H "Content-Type: application/json" \
+                                -d '{"query": "Imagine Dragons"}' \
+                                https://your_domain/search_youtube
+                            </code>
+                        </pre>
+                    </p>
+                </div>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">500: Internal Server Error</span></h4>
+                    <p class="error-description">This error can occur for a few reasons:</p>
+                    <ul>
+                        <li>The YouTube API key is not configured correctly.</li>
+                        <li>There was an error connecting to the YouTube API.</li>
+                    </ul>
+                    <p class="solution">
+                        <strong>Solution:</strong>
+                        <ul>
+                            <li>Verify that you have correctly set the YouTube API key in the <code>config.json</code> file.
+                            <li>Ensure that your YouTube API key has the necessary permissions for search operations.
+                            <li>Check your internet connection and try the request again.
+                        </ul>
+                    </p>
+                </div>
+                <div class="troubleshooting-item">
+                    <h4><span class="error-code">404: Not Found</span></h4>
+                    <p class="error-description">This error occurs when no results are found for the given search query.</p>
+                    <p class="solution">
+                        <strong>Solution:</strong> Try a different search query or make sure that the query is correctly formatted.
+                    </p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>General Troubleshooting Tips</h3>
+                <ul>
+                    <li><strong>Double-Check Tokens:</strong> Make sure you are using the correct API token and console token for each request.</li>
+                    <li><strong>Verify Headers:</strong> Ensure that you are including the necessary headers (such as `Console-Token`) in your requests.</li>
+                    <li><strong>Check Request Body:</strong>  Make sure that the request body is correctly formatted (usually JSON) and includes all required data.</li>
+                    <li><strong>Use Debugging Tools:</strong> Utilize browser developer tools (Network tab) or command-line tools (like `curl`) to inspect requests and responses for errors.</li>
+                    <li><strong>Consult the API Documentation:</strong> Refer to the comprehensive documentation for detailed information on each endpoint, request format, and expected responses.</li>
+                    <li><strong>Contact Support:</strong> If you are still unable to resolve an issue, contact the Kaede API support team for assistance.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

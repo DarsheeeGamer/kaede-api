@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaede API Developer Portal</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: bold;
+            color: #007bff; /* Blue color */
+        }
+
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .section h3 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0062cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kaede API Developer Portal</h1>
+        </div>
+
+        <div class="content">
+            {% if logged_in %}
+                <h2>Welcome, {{ username }}!</h2>
+                <p>Your Console Token: {{ console_token }}</p>
+                <div class="section">
+                    <h2>Connect Your Bot</h2>
+                    <!-- ... (Form to connect the bot using the provided API and console tokens) ... -->
+                </div>
+
+                <div class="section">
+                    <h2>Route Builder</h2>
+                    <!-- ... (Form to create routes for the bot) ... -->
+                    <form id="route-builder-form">
+                        <div class="input-group">
+                            <label for="route-name">Route Name:</label>
+                            <input type="text" id="route-name" name="route_name">
+                        </div>
+                        <div class="input-group">
+                            <label for="route-method">Method:</label>
+                            <select id="route-method" name="route_method">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="route-path">Path:</label>
+                            <input type="text" id="route-path" name="route_path">
+                        </div>
+                        <button type="button" class="button" onclick="buildRoute()">Build Route</button>
+                    </form>
+                    <div id="route-list">
+                        <!-- Routes will be displayed here -->
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>API Documentation</h2>
+                    <a href="/devportal/api_docs" class="button">View API Docs</a>
+                </div>
+
+                <div class="section">
+                    <h2>Troubleshooting</h2>
+                    <a href="/devportal/troubleshooting" class="button">Get Help</a>
+                </div>
+            {% else %}
+                <h2>Login</h2>
+                <form id="login-form" method="POST" action="/devportal/login">
+                    <div class="input-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <button type="submit" class="button">Login</button>
+                    {% if login_error %}
+                        <p style="color: red;">{{ login_error }}</p>
+                    {% endif %}
+                </form>
+
+                <p>Don't have an account? No problem. You can register <a href="/register">here</a>.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // ... (Your JavaScript from the previous example) ...
+
+        // Route builder logic 
+        function buildRoute() {
+            const routeName = document.getElementById('route-name').value;
+            const routeMethod = document.getElementById('route-method').value;
+            const routePath = document.getElementById('route-path').value;
+
+            fetch('/devportal/build_route/{{ console_token }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `route_name=${routeName}&route_method=${routeMethod}&route_path=${routePath}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display success message or handle errors
+                console.log(data);
+                // Update route list 
+                const routeList = document.getElementById('route-list');
+                routeList.innerHTML += `<p>${routeName} - ${routeMethod} - ${routePath}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

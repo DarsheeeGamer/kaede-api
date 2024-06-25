@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaede API Documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: bold;
+            color: #007bff; /* Blue color */
+        }
+
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .section h3 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: #fff;
+        }
+
+        .dropdown::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 8px solid #ccc;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0062cc;
+        }
+
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            display: block;
+            font-family: 'Consolas', monospace;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .fa-code { /* Icon styling */
+            margin-right: 5px;
+        }
+
+        .api-docs-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .api-docs-list li {
+            margin-bottom: 10px;
+        }
+
+        .api-docs-list li h3 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        .api-docs-list li p {
+            margin-bottom: 5px;
+        }
+
+        .api-docs-list li pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Kaede API Documentation</h1>
+        </div>
+
+        <div class="content">
+            <h2>API Overview</h2>
+            <p>
+                The Kaede API is a powerful tool for developers to build custom Discord bots and integrate them with 
+                various functionalities. The API provides a robust set of endpoints for connecting your bots to the Kaede 
+                platform, sending and receiving commands, and accessing external services like YouTube.
+            </p>
+            
+            <h3>Key Features:</h3>
+            <ul>
+                <li><strong>Bot Registration:</strong> Easily register your Discord bots and obtain API and console tokens.</li>
+                <li><strong>Bot Connection:</strong> Connect your bots to the Kaede platform to enable two-way communication.</li>
+                <li><strong>Command Queue:</strong> Send commands to your connected bots and receive responses through a robust queue system.</li>
+                <li><strong>Route Builder:</strong> Define custom routes for your bots, expanding their capabilities and functionality.</li>
+                <li><strong>YouTube Integration:</strong> Search for YouTube videos and send the results to your bots.</li>
+                <li><strong>API Documentation:</strong> Comprehensive documentation provides clear instructions and examples for using each endpoint.</li>
+            </ul>
+
+            <h3>Why Use the Kaede API?</h3>
+            <ul>
+                <li><strong>Simplified Development:</strong> Streamlined API makes it easier to build and manage Discord bots.</li>
+                <li><strong>Enhanced Functionality:</strong> Access a wider range of capabilities through integrated services and custom routes.</li>
+                <li><strong>Scalability:</strong>  Designed to handle multiple bots and interactions efficiently.</li>
+            </ul>
+
+            <h2>API Endpoints</h2>
+            <ul class="api-docs-list">
+                <li>
+                    <h3>/register_bot (POST)</h3>
+                    <p>Registers a new bot. Requires a username and Discord bot token.  To get a bot token, you need to register a bot in the <a href="http://ro04.pylex.me:9270/devportal">Kaede Developer Portal</a>.</p>
+                    <h4>Request Body:</h4>
+                    <pre>
+                        {
+                            "username": "your_bot_username",
+                            "discord_bot_token": "your_bot_token"
+                        }
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "api_token": "your_api_token",
+                            "console_token": "your_console_token",
+                            "dev_portal_link": "http://ro04.pylex.me:9270/devportal"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>400:</strong> Bad Request - Username or Discord bot token is missing.</li>
+                        <li><strong>401:</strong> Unauthorized - Invalid Discord bot token.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -X POST -H "Content-Type: application/json" \
+                            -d '{"username": "MyBot", "discord_bot_token": "YOUR_DISCORD_BOT_TOKEN"}' \
+                            http://ro04.pylex.me:9270/register_bot
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/connect_bot/<api_token> (POST)</h3>
+                    <p>Connects a bot to the console.</p>
+                    <h4>Headers:</h4>
+                    <pre>
+                        Console-Token: your_console_token
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "message": "Bot connected"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>401:</strong> Unauthorized - Invalid API token or console token.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                            http://ro04.pylex.me:9270/connect_bot/YOUR_API_TOKEN
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/disconnect_bot/<api_token> (POST)</h3>
+                    <p>Disconnects a bot from the console.</p>
+                    <h4>Headers:</h4>
+                    <pre>
+                        Console-Token: your_console_token
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "message": "Bot disconnected successfully"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>401:</strong> Unauthorized - Invalid API token or console token.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                            http://ro04.pylex.me:9270/disconnect_bot/YOUR_API_TOKEN
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/send_command/<api_token> (POST)</h3>
+                    <p>Sends a command to the connected bot.</p>
+                    <h4>Headers:</h4>
+                    <pre>
+                        Console-Token: your_console_token
+                    </pre>
+                    <h4>Request Body:</h4>
+                    <pre>
+                        {
+                            "command": "your_command"
+                        }
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "message": "Command added to queue"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>401:</strong> Unauthorized - Invalid API token or console token.</li>
+                        <li><strong>400:</strong> Bad Request - Command is missing.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                            -H "Content-Type: application/json" \
+                            -d '{"command": "play music"}' \
+                            http://ro04.pylex.me:9270/send_command/YOUR_API_TOKEN
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/get_command/<api_token> (GET)</h3>
+                    <p>Retrieves the next command from the queue for the given bot.</p>
+                    <h4>Headers:</h4>
+                    <pre>
+                        Console-Token: your_console_token
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "command": "your_command"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>401:</strong> Unauthorized - Invalid API token or console token.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                            http://ro04.pylex.me:9270/get_command/YOUR_API_TOKEN
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/get_bot_token/<username> (GET)</h3>
+                    <p>Retrieves the bot's API token and Discord bot token.</p>
+                    <h4>Headers:</h4>
+                    <pre>
+                        Console-Token: your_console_token
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "api_token": "your_api_token",
+                            "discord_bot_token": "your_bot_token"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>404:</strong> Not Found - Bot not found for the given username.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                            http://ro04.pylex.me:9270/get_bot_token/MyBot
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/search_youtube/<api_token> (POST)</h3>
+                    <p>Searches YouTube for a song and sends the data back to the bot.</p>
+                    <h4>Headers:</h4>
+                    <pre>
+                        Console-Token: your_console_token
+                    </pre>
+                    <h4>Request Body:</h4>
+                    <pre>
+                        {
+                            "query": "your_search_query"
+                        }
+                    </pre>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "message": "Video URL added to queue",
+                            "video_url": "https://www.youtube.com/watch?v=your_video_id"
+                        }
+                    </pre>
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li><strong>401:</strong> Unauthorized - Invalid API token or console token.</li>
+                        <li><strong>400:</strong> Bad Request - Query is missing.</li>
+                        <li><strong>500:</strong> Internal Server Error - YouTube API key is not configured or YouTube search failed.</li>
+                        <li><strong>404:</strong> Not Found - No results found for the given search query.</li>
+                    </ul>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                            -H "Content-Type: application/json" \
+                            -d '{"query": "Imagine Dragons"}' \
+                            http://ro04.pylex.me:9270/search_youtube/YOUR_API_TOKEN
+                        </code>
+                    </pre>
+                </li>
+                <li>
+                    <h3>/status (GET, POST)</h3>
+                    <p>Returns status information about the API.</p>
+                    <h4>Response:</h4>
+                    <pre>
+                        {
+                            "cpu_percent": 10.5,
+                            "memory": {
+                                "total": 8589934592,
+                                "available": 2147483648,
+                                "percent": 75.0,
+                                "used": 6442450944,
+                                "free": 2147483648
+                            },
+                            "network": {
+                                "bytes_sent": 123456789,
+                                "bytes_recv": 987654321,
+                                "packets_sent": 1000,
+                                "packets_recv": 2000,
+                                "errin": 0,
+                                "errout": 0,
+                                "dropin": 0,
+                                "dropout": 0
+                            },
+                            "api_health_checks": [
+                                {
+                                    "name": "Database Connection",
+                                    "status": "OK"
+                                },
+                                {
+                                    "name": "Network Connectivity",
+                                    "status": "OK"
+                                },
+                                {
+                                    "name": "Disk Space",
+                                    "status": "OK"
+                                },
+                                {
+                                    "name": "Redis Connection",
+                                    "status": "OK"
+                                }
+                            ],
+                            "redis_version": "6.2.6",
+                            "redis_used_memory": "1.50GB",
+                            "redis_connected_clients": 10,
+                            "connected_bots": [
+                                "Bot1",
+                                "Bot2"
+                            ]
+                        }
+                    </pre>
+                    <h4>Example:</h4>
+                    <pre>
+                        <code>
+                            curl http://ro04.pylex.me:9270/status
+                        </code>
+                    </pre>
+                </li>
+            </ul>
+
+            <h2>Developer Portal</h2>
+            <p>
+                The Kaede Developer Portal is located at <a href="http://ro04.pylex.me:9270/devportal">http://ro04.pylex.me:9270/devportal</a> and provides a user-friendly interface for managing your bots, building routes, and accessing API documentation.
+            </p>
+            <h3>Key Features:</h3>
+            <ul>
+                <li><strong>Login/Registration:</strong> Create an account or log in to access your developer dashboard.</li>
+                <li><strong>Bot Management:</strong> View your registered bots, connect and disconnect them from the API.</li>
+                <li><strong>Route Builder:</strong> Define custom routes for your bots to extend their functionality.</li>
+                <li><strong>API Documentation:</strong> Access detailed API documentation for quick reference.</li>
+                <li><strong>Troubleshooting:</strong> Access common error messages and troubleshooting guides for help with common issues.</li>
+            </ul>
+
+            <h2>Example Usage</h2>
+            <h3>1. Register a Bot</h3>
+            <p>
+                To register a bot, use the <code>/register_bot</code> endpoint with a POST request. 
+                Include your bot's username and Discord bot token in the request body.
+            </p>
+            <pre>
+                <code>
+                    curl -X POST -H "Content-Type: application/json" \
+                    -d '{"username": "MyBot", "discord_bot_token": "YOUR_DISCORD_BOT_TOKEN"}' \
+                    http://ro04.pylex.me:9270/register_bot
+                </code>
+            </pre>
+            <p>
+                The response will include the API token, console token, and a link to the developer portal.
+            </p>
+
+            <h3>2. Connect a Bot</h3>
+            <p>
+                To connect a bot to the console, use the <code>/connect_bot/<api_token></code> endpoint with a POST request.
+                Include the console token in the request headers.
+            </p>
+            <pre>
+                <code>
+                    curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                    http://ro04.pylex.me:9270/connect_bot/YOUR_API_TOKEN
+                </code>
+            </pre>
+            <p>
+                The response will confirm that the bot is connected.
+            </p>
+
+            <h3>3. Send a Command to a Bot</h3>
+            <p>
+                To send a command to a connected bot, use the <code>/send_command/<api_token></code> endpoint with a POST request.
+                Include the console token in the request headers and the command in the request body.
+            </p>
+            <pre>
+                <code>
+                    curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                    -H "Content-Type: application/json" \
+                    -d '{"command": "play music"}' \
+                    http://ro04.pylex.me:9270/send_command/YOUR_API_TOKEN
+                </code>
+            </pre>
+            <p>
+                The response will confirm that the command has been added to the bot's queue.
+            </p>
+
+            <h3>4. Retrieve a Command from the Queue</h3>
+            <p>
+                To retrieve the next command from the queue for a bot, use the <code>/get_command/<api_token></code> endpoint with a GET request.
+                Include the console token in the request headers.
+            </p>
+            <pre>
+                <code>
+                    curl -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                    http://ro04.pylex.me:9270/get_command/YOUR_API_TOKEN
+                </code>
+            </pre>
+            <p>
+                The response will contain the next command in the queue.
+            </p>
+
+            <h3>5. Build a Custom Route</h3>
+            <p>
+                To build a custom route for your bot, use the <code>/devportal/build_route/<console_token></code> endpoint with a POST request.
+                Include the route name, method, and path in the request body.
+            </p>
+            <pre>
+                <code>
+                    curl -X POST -H "Content-Type: application/x-www-form-urlencoded" \
+                    -d "route_name=my_custom_route&route_method=POST&route_path=/my_route" \
+                    http://ro04.pylex.me:9270/devportal/build_route/YOUR_CONSOLE_TOKEN
+                </code>
+            </pre>
+            <p>
+                The response will confirm that the route has been registered.  You will then be redirected to the developer portal.
+            </p>
+
+            <h3>6. Search for a YouTube Video</h3>
+            <p>
+                To search for a YouTube video, use the <code>/search_youtube/<api_token></code> endpoint with a POST request. 
+                Include the console token in the request headers and the search query in the request body.
+            </p>
+            <pre>
+                <code>
+                    curl -X POST -H "Console-Token: YOUR_CONSOLE_TOKEN" \
+                    -H "Content-Type: application/json" \
+                    -d '{"query": "Imagine Dragons"}' \
+                    http://ro04.pylex.me:9270/search_youtube/YOUR_API_TOKEN
+                </code>
+            </pre>
+            <p>
+                The response will include the URL of the YouTube video and a message indicating that the video URL has been added to the bot's queue.
+            </p>
+
+            <h3>7. Get Status</h3>
+            <p>
+                To get the current status of the API, use the <code>/status</code> endpoint with a GET request.
+            </p>
+            <pre>
+                <code>
+                    curl http://ro04.pylex.me:9270/status
+                </code>
+            </pre>
+            <p>
+                The response will include detailed information about the API, including system metrics, health checks, Redis information, and a list of connected bots.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

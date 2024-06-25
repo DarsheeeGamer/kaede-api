@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kaede Bot API - Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #007bff, #0056b3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 800px;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kaede Bot API - Dashboard</h1>
+        <div class="content">
+            <div class="section">
+                <h2>Welcome, {{ username }}</h2>
+                <p>This is your user dashboard. Here you can manage your projects and bots.</p>
+            </div>
+
+            <div class="section">
+                <h2>Your Projects</h2>
+                <p>Here you can see a list of your added projects (bots).</p>
+                <table id="projects-table">
+                    <thead>
+                        <tr>
+                            <th>Bot Token</th>
+                            <th>Connected</th>
+                            <th>API Token</th>
+                            <th>Console Token</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Add New Project</h2>
+                <p>Add a new project (bot) to your account.</p>
+                <form id="add-project-form" method="POST">
+                    <input type="hidden" name="username" value="{{ username }}">
+                    <input type="text" name="bot_token" placeholder="Bot Token" required>
+                    <button type="submit">Add Project</button>
+                </form>
+            </div>
+        </div>
+
+        <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+    </div>
+
+    <script>
+        // Fetch projects on page load
+        fetch('/get_projects', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'user_token=' + window.localStorage.getItem('user_token')
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Clear existing projects in the table
+            const projectsTable = document.getElementById('projects-table').getElementsByTagName('tbody')[0];
+            projectsTable.innerHTML = '';
+
+            // Add each project to the table
+            data.projects.forEach(project => {
+                const row = projectsTable.insertRow();
+                const botTokenCell = row.insertCell();
+                const connectedCell = row.insertCell();
+                const apiTokenCell = row.insertCell();
+                const consoleTokenCell = row.insertCell();
+                const actionsCell = row.insertCell();
+
+                botTokenCell.textContent = project.name;
+                connectedCell.textContent = project.connected ? 'Yes' : 'No';
+                apiTokenCell.textContent = project.api_token;
+                consoleTokenCell.textContent = ''; // Initially empty
+
+                const getTokensButton = document.createElement('button');
+                getTokensButton.textContent = 'Get Tokens';
+                getTokensButton.addEventListener('click', () => {
+                    fetch('/get_bot_token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'username=' + '{{ username }}' + '&bot_token=' + project.name
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display the API and console tokens
+                        apiTokenCell.textContent = data.token;
+                        consoleTokenCell.textContent = data.console_token;
+                    })
+                    .catch(error => {
+                        alert('Error fetching tokens: ' + error);
+                    });
+                });
+
+                actionsCell.appendChild(getTokensButton);
+            });
+        })
+        .catch(error => {
+            alert('Error fetching projects: ' + error);
+        });
+
+        // Handle the add project form submission
+        const addProjectForm = document.getElementById('add-project-form');
+        addProjectForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(addProjectForm);
+            fetch('/add_bot', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display success message or error
+                alert(data.message);
+                // Reload the projects table
+                window.location.reload();
+            })
+            .catch(error => {
+                alert('Error adding project: ' + error);
+            });
+        });
+    </script>
+</body>
+</html>
