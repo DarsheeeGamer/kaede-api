@@ -41,7 +41,7 @@ You can run the provided code locally for development and testing purposes.
 
 ## Contact
 
-For inquiries or support, contact [Your Email Address]
+For inquiries or support, contact cleaverdeath@gmail.com
 
 ## License
 
