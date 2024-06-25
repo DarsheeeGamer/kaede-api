@@ -34,7 +34,7 @@ client_mongodb = pymongo.MongoClient(MONGODB_URI)
 db = client_mongodb[DATABASE_NAME]
 
 # --- Encryption Key ---
-ENCRYPTION_KEY = b'2MwntYv2lfnc82zWMfDPhB5r23veWoo5u6rZjYUJhBU='  # Replace with your secure key!
+ENCRYPTION_KEY = b'sorry cant reveal='  # Replace with your secure key!
 f = Fernet(ENCRYPTION_KEY)
 
 # --- Functions ---
